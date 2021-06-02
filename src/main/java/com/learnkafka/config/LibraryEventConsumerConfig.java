@@ -17,7 +17,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 @EnableKafka
 public class LibraryEventConsumerConfig {
 
-    @Autowired
+   /* @Autowired
     KafkaProperties properties;
 
     @Bean
@@ -30,5 +30,5 @@ public class LibraryEventConsumerConfig {
                 .getIfAvailable(() -> new DefaultKafkaConsumerFactory<>(this.properties.buildConsumerProperties())));
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
-    }
+    }*/
 }
