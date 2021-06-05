@@ -1,7 +1,7 @@
 package com.learnkafka.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.learnkafka.LibraryEventService;
+import com.learnkafka.service.LibraryEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;

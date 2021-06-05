@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerConta
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -18,6 +19,9 @@ import org.springframework.retry.backoff.BackOffPolicy;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableKafka
@@ -56,8 +60,24 @@ public class LibraryEventConsumerConfig {
         return fixedBackOffPolicy;
     }
 
+    /**
+     * This will Retry for all/any exception
     private RetryPolicy simpleRetryPolicy() {
         SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy();
+        simpleRetryPolicy.setMaxAttempts(3);
+        return simpleRetryPolicy;
+    }
+     */
+
+    /**
+     * This retry is used, where for some exception type we don't want to retry
+     * @return
+     */
+    private RetryPolicy simpleRetryPolicy() {
+        Map<Class<? extends Throwable>, Boolean> retryableExceptions = new HashMap<>();
+        retryableExceptions.put(IllegalArgumentException.class, false);
+        retryableExceptions.put(RecoverableDataAccessException.class, true);
+        SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(3,retryableExceptions);
         simpleRetryPolicy.setMaxAttempts(3);
         return simpleRetryPolicy;
     }
