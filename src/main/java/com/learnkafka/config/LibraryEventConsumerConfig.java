@@ -1,6 +1,8 @@
 package com.learnkafka.config;
 
+import com.learnkafka.service.LibraryEventService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,6 +22,7 @@ import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +33,9 @@ public class LibraryEventConsumerConfig {
 
     @Autowired
     KafkaProperties properties;
+
+    @Autowired
+    LibraryEventService libraryEventService;
 
     @Bean
     @ConditionalOnMissingBean(name = "kafkaListenerContainerFactory")
@@ -44,6 +50,24 @@ public class LibraryEventConsumerConfig {
            log.info("Exception is ConsumeConfig is {} and the record {}", thrownException.getMessage(),data);
        }));
        factory.setRetryTemplate(retryTemplate());
+       factory.setRecoveryCallback((context -> {
+           if(context.getLastThrowable().getCause() instanceof RecoverableDataAccessException){
+               // invoke recovery logic
+              /* Arrays.asList(context.attributeNames())
+                       .forEach(attributeName ->
+                               {
+                                   log.info("Attribute name is {}", attributeName);
+                                   log.info("Attribute value is {}", context.getAttribute(attributeName));
+                               }
+                       );*/
+               ConsumerRecord<Integer, String> consumerRecord = (ConsumerRecord<Integer, String>)context.getAttribute("record");
+               libraryEventService.handleRecovery(consumerRecord);
+           }else {
+               log.info("inside a Non recoverable logic");
+               return new RuntimeException(context.getLastThrowable().getMessage());
+           }
+           return null;
+       }));
         return factory;
     }
 
