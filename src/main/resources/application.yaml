@@ -19,6 +19,9 @@ spring:
       bootstrap-server: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+basic:
+  value1: "Test Basic prop"
+  basicDate: "08-06-2021"
 
 
   datasource:
