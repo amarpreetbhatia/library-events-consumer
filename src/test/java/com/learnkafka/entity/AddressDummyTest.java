@@ -9,10 +9,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class AddressDummyTest {
@@ -37,6 +37,31 @@ class AddressDummyTest {
     void validateAddressValue_valid(){
         AddressDummy addressDummy = new AddressDummy();
         addressDummy.setAddress("Sydney");
+        Set<ConstraintViolation<AddressDummy>> violations = validator.validate(addressDummy);
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void validateAddressDateValue_valid(){
+        AddressDummy addressDummy = new AddressDummy();
+        addressDummy.setAddress("Sydney");
+        addressDummy.setAddressDate("sssss");
+        //yyyy-MM-dd
+        addressDummy.setAddressLocalDate(LocalDate.parse("2016-07-07"));
+        Set<ConstraintViolation<AddressDummy>> violations = validator.validate(addressDummy);
+        assertFalse(violations.isEmpty());
+        violations.forEach(e -> {
+            assertEquals("This is not a valid date format",e.getMessage());
+        });
+    }
+
+    @Test
+    void validateAddressDateValue_valid2(){
+        AddressDummy addressDummy = new AddressDummy();
+        addressDummy.setAddress("Sydney");
+        addressDummy.setAddressDate("2021-01-16T20:00:00+10:00");
+        //yyyy-MM-dd
+        addressDummy.setAddressLocalDate(LocalDate.parse("2016-01-01"));
         Set<ConstraintViolation<AddressDummy>> violations = validator.validate(addressDummy);
         assertTrue(violations.isEmpty());
     }
