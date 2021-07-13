@@ -10,6 +10,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,6 +66,14 @@ class AddressDummyTest {
         addressDummy.setAddressLocalDate(LocalDate.parse("2016-01-01"));
         Set<ConstraintViolation<AddressDummy>> violations = validator.validate(addressDummy);
         assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void zoneDateTime_main() {
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse("2011-12-03T10:15:30+01:00");
+        System.out.println("----------------------------");
+        System.out.println(Date.from(zonedDateTime.toInstant()));
+        System.out.println("----------------------------");
     }
 
 }
